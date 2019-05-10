@@ -11,6 +11,9 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import { connect } from 'react-redux';
+import {requestArrayPoints, requestPointsSumm, requestPointsMulti} from '../../action/index';
+import { bindActionCreators } from 'redux';
 
 class ElepticWeb extends Component {
 
@@ -38,50 +41,16 @@ class ElepticWeb extends Component {
         mult_p: ''
     }
 
-
     render(){
 
         const handleChange = name => event => {
             this.setState({ [name]: event.target.value });
         };
 
-        const calculation = () => {
-            const {a, b, mod, x1, y1, x2, y2, modS, y_mult, x_mult, mult} = this.state
-            const disc = 
-            this.setState({
-                prostota: test_ferma(Number(a), Number(mod)), 
-                disc: discriminant(Number(a), Number(b), Number(mod)),
-                array_points: arrayPoints(arrayOfSquaresModulo(Number(mod)), Number(a), Number(b)),
-                array_squares_modulo: arrayOfSquaresModulo(Number(mod)),
-
-            })
-        }
-
-        const sum = () => { 
-            const {x1, y1, x2, y2, modS} = this.state
-            this.setState({
-                sum_p: sum_points({x: Number(x1), y: Number(y1)}, {x: Number(x2), y: Number(y2)}, Number(modS))
-            })
-        }
-
-        const multi = () => { 
-            const {a, mod, y_mult, x_mult, mult} = this.state
-            this.setState({
-                mult_p: multiply_points({x: Number(x_mult), y: Number(y_mult)}, Number(a), Number(mult), Number(mod))
-            })
-        }
+        const {a, b, mod, x1, y1, x2, y2, y_mult, x_mult, mult} = this.state
 
 
-        const {a, b, mod, x1, y1, x2, y2, modS, y_mult, x_mult, mult} = this.state
-        const disc = this.state.disc
-        const prostota = this.state.prostota
-        const array_squares_modulo = this.state.array_squares_modulo
-        const array_points = this.state.array_points
-        const sum_p = this.state.sum_p
-        const mult_p = this.state.mult_p
-
-        console.log('sum_p', sum_p)
-      
+        const {array_points, array_modul, discriminant, test_ferma, summa, multi} = this.props;
         return(
 
                     <Paper style={{margin: '5%', width: '90%', paddingBottom: '35px'}}>
@@ -114,31 +83,31 @@ class ElepticWeb extends Component {
                             />
                         </Grid>
                         <Grid item xs={12} sm={3}>
-                            <Button color="primary" onClick={calculation}>
+                            <Button color="primary" onClick={() => {this.props.requestArrayPoints({m: mod, a: a, b: b}) }}>
                                 считать
                             </Button>
                         </Grid>
                       
                     </Grid>                      
                         {
-                            disc &&
+                            discriminant &&
                            <div>
                                <Grid container spacing={24} style={{marginLeft: '5%', width: '90%'}}>
 
                                 <Grid item xs={12} sm={6}>
                                     <Paper square elevation={8}>
                                         <div style={{height: '300px', overflowY: 'scroll'}}>
-                                            <div>{prostota} </div>
-                                            <div>дискримнант равен {disc}</div>
-                                            {array_squares_modulo && array_squares_modulo.map((el, i) => {
+                                            <div>{test_ferma} </div>
+                                            <div>дискримнант равен {discriminant}</div>
+                                            {array_modul && array_modul.map((el, i) => {
                                                 return(
-                                                    <div>{`${i}^2 = ${el}`}</div>
+                                                    <div key={i}>{`${i}^2 = ${el}`}</div>
                                                 )
                                             })}
 
                                             {array_points && array_points.map((el, i) => {
                                                 return(
-                                                    <div>
+                                                    <div key={i}>
                                                     {`
                                                     x${i} y^2 = ${el.y_2} 
                                                     P${i} = (${el.points[0] ? el.points[0].index : '-'}, ${el.points[0] ? el.points[0].point : '-'})
@@ -155,10 +124,12 @@ class ElepticWeb extends Component {
                                 <Grid item xs={12} sm={6}>
                                         <Paper square elevation={8}>
                                                 <Charts
-                                                    data={array_points}
+                                                    data={array_points || []}
                                                 />
                                         </Paper>     
                                 </Grid>              
+
+                                   
                                     
                                 <Grid item xs={12} sm={6}>
                                     <Paper square elevation={8}>
@@ -170,7 +141,7 @@ class ElepticWeb extends Component {
                                                 </TableRow>
                                             </TableHead>
                                             <TableBody>
-                                            {array_squares_modulo && array_squares_modulo.map((el, i) => (
+                                            {array_modul && array_modul.map((el, i) => (
                                                 <TableRow key={i}>
                                                     <TableCell>{`${i}^2`}</TableCell>
                                                     <TableCell align='left'>{el}</TableCell>
@@ -208,6 +179,9 @@ class ElepticWeb extends Component {
                                             </Table>
                                         </Paper>
                                     </Grid> 
+                                    
+
+
 
                                     <Grid item xs={12} sm={12}>
                                         <Paper square elevation={8}>
@@ -243,12 +217,19 @@ class ElepticWeb extends Component {
                                                     <TextField
                                                         fullWidth
                                                         label="результат"
-                                                        value={ mult_p.x ? ` P( ${x_mult} , ${y_mult} ) * ${mult} = P( ${mult_p.x} , ${mult_p.y} )` : ''}
+                                                        value={ multi.x ? ` P( ${x_mult} , ${y_mult} ) * ${mult} = P( ${multi.x} , ${multi.y} )` : ''}
                                                         margin="normal"
                                                     />
                                                 </Grid>
                                                 <Grid item xs={12} sm={3}>
-                                                    <Button color="primary" onClick={multi}>
+                                                    <Button color="primary" onClick={() => {
+                                                        this.props.requestPointsMulti({
+                                                            p:{x: Number(x_mult), y: Number(y_mult) },
+                                                            a: Number(a),                                                 
+                                                            mult: Number(mult),
+                                                            m: Number(mod),
+                                                        })
+                                                    }}>
                                                         считать
                                                     </Button>
                                                 </Grid>
@@ -258,7 +239,7 @@ class ElepticWeb extends Component {
                                     <Grid item xs={12} sm={12}>
                                         <Paper square elevation={8}>
                                             <Grid container spacing={24} style={{marginLeft: '5%', width: '90%'}}>
-                                                <Grid item xs={1} sm={1}>
+                                                <Grid item xs={2} sm={2}>
                                                     <TextField
                                                         fullWidth
                                                         label="x1"
@@ -267,7 +248,7 @@ class ElepticWeb extends Component {
                                                         margin="normal"
                                                     />
                                                 </Grid>
-                                                <Grid item xs={1} sm={1}>
+                                                <Grid item xs={2} sm={2}>
                                                     <TextField
                                                         fullWidth
                                                         label="y1"
@@ -277,7 +258,7 @@ class ElepticWeb extends Component {
                                                         type='number'
                                                     />
                                                 </Grid>
-                                                <Grid item xs={1} sm={1}>
+                                                <Grid item xs={2} sm={2}>
                                                     <TextField
                                                         fullWidth
                                                         label="x2"
@@ -287,7 +268,7 @@ class ElepticWeb extends Component {
                                                         type='number'
                                                     />
                                                 </Grid>
-                                                <Grid item xs={1} sm={1}>
+                                                <Grid item xs={2} sm={2}>
                                                     <TextField
                                                         fullWidth
                                                         label="y2"
@@ -297,26 +278,23 @@ class ElepticWeb extends Component {
                                                         type='number'
                                                     />
                                                 </Grid>
-                                                <Grid item xs={2} sm={2}>
-                                                    <TextField
-                                                        fullWidth
-                                                        label="поле"
-                                                        value={modS}
-                                                        onChange={handleChange('modS')}
-                                                        margin="normal"
-                                                        type='number'
-                                                    />
-                                                </Grid> 
-                                                <Grid item xs={6} sm={6}>
+                                             
+                                                <Grid item xs={4} sm={4}>
                                                     <TextField
                                                         fullWidth
                                                         label="результат"
-                                                        value={ sum_p.x ? ` P( ${x1} , ${y1} ) + P( ${x2} , ${y2} ) = P( ${sum_p.x} , ${sum_p.y} )` : ''}
+                                                        value={ summa.x ? ` P( ${x1} , ${y1} ) + P( ${x2} , ${y2} ) = P( ${summa.x} , ${summa.y} )` : ''}
                                                         margin="normal"
                                                     />
                                                 </Grid> 
                                                 <Grid item xs={12} sm={3}>
-                                                    <Button color="primary" onClick={sum}>
+                                                    <Button color="primary" onClick={
+                                                        () => {this.props.requestPointsSumm({
+                                                            p1: {x: Number(x1), y:Number(y1) },
+                                                            p2:{x: Number(x2), y: Number(y2)},
+                                                            m: Number(mod)
+                                                        })}
+                                                    }>
                                                         считать
                                                     </Button>
                                                 </Grid>
@@ -334,4 +312,18 @@ class ElepticWeb extends Component {
     }
 }
 
-export default ElepticWeb
+export default connect(
+    state => ({
+        discriminant: state.answers.discriminant || '',
+        test_ferma: state.answers.test_ferma || '',
+        array_points: state.answers.array_points || [],
+        array_modul: state.answers.array_modul || [],
+        summa: state.answers.summa || {},
+        multi: state.answers.multi || {},
+    }),
+    dispatch => bindActionCreators({
+        requestArrayPoints: requestArrayPoints,
+        requestPointsSumm: requestPointsSumm,
+        requestPointsMulti: requestPointsMulti
+    }, dispatch)
+)(ElepticWeb)

@@ -91,8 +91,9 @@ const DiffiHelmana = (p, multA, multB, a, m) => {
 
 
 //console.log(multiply_points({x: 23161, y:17992}, -3, 2, 31991))
+console.log(multiply_points({x: 45, y:720}, -1, 1, 751))
 
 //console.log(sum_points(multiply_points({x:4, y:1 }, 1, 0, 7), {x:4, y:1}, 7))
 //console.log(sum_points({x:45, y:720 }, { x:45, y:720}, 751))
 //console.log(arrayPoints(arrayOfSquaresModulo(7), 3,1))
-console.log(DiffiHelmana({x: 2, y: 2}, 121, 203, 0, 211))
+//console.log(DiffiHelmana({x: 2, y: 2}, 121, 203, 0, 211))
