@@ -20,6 +20,21 @@ export default (state={}, action) => {
                 ...state,
                 multi: action.payload,
             }
+        case 'STORE_RESULT_DH':
+        return {
+            ...state,
+            resultDH: action.payload,
+        }
+        case 'STORE_RESULT_MA':
+        return {
+            ...state,
+            resultMA: action.payload,
+        }
+        case 'STORE_RESULT_ELGAM':
+        return {
+            ...state,
+            resultElGam: action.payload,
+        }
         default:
             return state;
     }

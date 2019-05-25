@@ -22,7 +22,6 @@ export const requestPointsSumm = (res) => {
 };
 
 export const points_multi = (res) => {
-    console.log('re')
     return { 
         type: 'STORE_POINTS_MULTI',
         payload: res
@@ -32,4 +31,40 @@ export const points_multi = (res) => {
 export const requestPointsMulti = (res) => {
     console.log('RESS')
     return { type: 'FETCHED_MULTI_POINTS', action: res }
+};
+
+export const result_DH = (res) => {
+    return { 
+        type: 'STORE_RESULT_DH',
+        payload: res
+    }
+}
+
+export const requestResultDH = (res) => {
+    console.log('RESS')
+    return { type: 'FETCHED_RESULT_DH', action: res }
+};
+
+export const result_MA = (res) => {
+    return { 
+        type: 'STORE_RESULT_MA',
+        payload: res
+    }
+}
+
+export const requestResultMA = (res) => {
+    console.log('RESS')
+    return { type: 'FETCHED_RESULT_MA', action: res }
+};
+
+export const result_ElGam = (res) => {
+    return { 
+        type: 'STORE_RESULT_ELGAM',
+        payload: res
+    }
+}
+
+export const requestResultElGam = (res) => {
+    console.log('RESS')
+    return { type: 'FETCHED_RESULT_ELGAM', action: res }
 };

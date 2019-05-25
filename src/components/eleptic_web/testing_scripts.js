@@ -83,17 +83,48 @@ const DiffiHelmana = (p, multA, multB, a, m) => {
         key_Alice:  multiply_points(multiply_points(p, a, multB, m), a, multA, m)}        
 }
 
+
+function gcd (x, y, s1=1, s2=0) {
+    console.log(x % y)
+    let q = Math.floor(x/y),
+    s1copy = s1;
+    return (x % y === 0) ? s2 : gcd(y, x%y, s1=s2, s2=s1copy-q*s2);
+   }
+
+   const MessiAmura = (p, eA, eB, numb_points,  a, m) => {
+    const dA = mod(gcd(eA, numb_points), m);
+    const dB = mod(gcd(eB, numb_points), m);
+    const eA_Pm = multiply_points(p, a, eA, m);
+    const eB_eA_Pm = multiply_points(eA_Pm, a, eB, m);
+    const dA_eB_eA_Pm = multiply_points(eB_eA_Pm, a, dA, m);
+    const dB_dA_eB_eA_Pm = multiply_points(dA_eB_eA_Pm, a, dB, m);
+    return { 
+        dA,
+        dB,
+        eA_Pm,
+        eB_eA_Pm,
+        dA_eB_eA_Pm,
+        dB_dA_eB_eA_Pm,
+    }
+}
+
+const ElGaMal = (C, Pm, e, k, a, m) => {
+    const eC = multiply_points(C, a, e, m);
+    const kC = multiply_points(C, a, k, m);
+    const keC = multiply_points(eC, a, k, m);
+    const Pm_sum_ekC = sum_points(Pm, keC, m);
+    const res_Bob = sum_points(Pm_sum_ekC, {x:keC.x, y: -keC.y}, m);
+    console.log({eC, kC, keC, Pm_sum_ekC, res_Bob})
+
+}
 //console.log(sum_points({x:8020, y:1740 }, { x:8020, y:30251}, 31991))
-
-
-
-//console.log(mod(563911,751))
-
-
+//console.log(MessiAmura({x: 2, y:16}, 11, 17, 23, -6, 23))
+console.log(ElGaMal({x: 2, y:8},{x: 3, y:13}, 7, 4, 1, 17))
+console.log(sum_points({x: 11, y:6}, {x: 6, y:2}, 17))
 //console.log(multiply_points({x: 23161, y:17992}, -3, 2, 31991))
-console.log(multiply_points({x: 45, y:720}, -1, 1, 751))
+//console.log(multiply_points({x: 45, y:720}, -1, 1, 751))
 
 //console.log(sum_points(multiply_points({x:4, y:1 }, 1, 0, 7), {x:4, y:1}, 7))
 //console.log(sum_points({x:45, y:720 }, { x:45, y:720}, 751))
 //console.log(arrayPoints(arrayOfSquaresModulo(7), 3,1))
-//console.log(DiffiHelmana({x: 2, y: 2}, 121, 203, 0, 211))
+//console.log(DiffiHelmana({x: 7, y: 8}, 5, 3, 1, 17))
